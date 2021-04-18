@@ -1,8 +1,14 @@
+#include <WiFiManager.h>
+#include <RedGlobals.h>
+
 /*
  * ********************************************************************************
  * 
  * ********************************************************************************
  */
+
+dConsole console;
+
 void handleConsole()
 {
   // console
@@ -77,12 +83,12 @@ void handleConsole()
     }
 if (getValue(console.commandString,' ',0) == "location")
 {
-    console.println(heatpumpLocation);
+    console.println(deviceLocation);
     console.println(myHostName);
     String newLocation = getValue(console.commandString,' ',1);
     if (newLocation.length() > 0)
     {
-      newLocation.toCharArray(heatpumpLocation,64);
+      newLocation.toCharArray(deviceLocation,64);
       writeConfigToDisk();
       console.print("Heatpump location changed to ");
       console.println(newLocation);

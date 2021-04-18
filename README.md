@@ -29,6 +29,13 @@
   1. heatpump/location/debug -- forwards all packets exchanged with hp
   2. heatpump/location/debug/set -- received command (on/off) to control debug mode
 
+# Version History
+
+## Version 1.0
+  V1.03 **currently deployed** was development in the Arduino IDE in 2018
+## Version 1.2
+  Direct port to Platform.IO and conversion to C++ while still retaining the original Library
+  This version was not tested on direct hardware
 
 # Hardware Notes
 
@@ -36,11 +43,16 @@ The implementation in Rye Manor uses Adafruit Huzzah board
 
 
 
-![The circuit is simple -- just a TTL RS232 interface](./media/schematic.jpg)
+![](./media/schematic.jpg)
+The circuit is simple -- just a TTL RS232 interface with a couple of 10K pullup resistors
 
 
-![Pin location on the HP controller board](./media/pinlocation.png)
 
+![](./media/pinlocation.png)
+
+Important to note the pin orientation on the HP controller board
+
+Also:
     - GPIO-0 must be tied to ground for programming
     - GPIO-0 floats to run program
     - GPIO-0 runs Red LED on Huzzah
