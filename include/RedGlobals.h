@@ -17,8 +17,7 @@
  * ********************************************************************************
 */
 
-
-#define VERSION "V1.2"
+#define VERSION "V1.2"               // N.B: document changes in README.md
 #define MQTT_TOPIC_PREFIX "heatpump" // prefix for all MQTT topics
 
 const unsigned int SEND_ROOM_TEMP_INTERVAL_MS = 60000;

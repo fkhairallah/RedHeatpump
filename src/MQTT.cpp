@@ -1,17 +1,13 @@
 
-/*
-  * ********************************************************************************
-
-   Configure the MQTT server by:
-    - create all the topic using prefix/location/subtopic
-    - configure MQTT server and port and setup callback routine
-    - attempt a connection and log to debug topic if success
-
- * ********************************************************************************
-*/
+/**********************************************************************************
+ *
+ * Configure the MQTT server by:
+ *     - create all the topic using prefix/location/subtopic
+ *     - configure MQTT server and port and setup callback routine
+ *     - attempt a connection and log to debug topic if success
+ * 
+ *********************************************************************************/
 #include <RedGlobals.h>
-
-
 
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);

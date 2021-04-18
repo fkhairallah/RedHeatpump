@@ -1,16 +1,19 @@
-/*
- * ********************************************************************************
-
- This file manages the top-level WIFI and board configuration for [Red] based projects
- 
- - Factory-fresh or unable to connect to WIFI it fires up a hotspot and a web server and allows the user to
-    configure device parameters
-
- - If a WIFI configuration exists, it connects then reads the configuration from config.json
-   and proceeds.
-
- * ********************************************************************************
-*/
+/**********************************************************************************
+ * 
+ * Converted to work with ArdionJSON V6 
+ * 
+ **********************************************************************************
+ *
+ * This file manages the top-level WIFI and board configuration 
+ * for [Red] based projects:
+ * 
+ * - Factory-fresh or unable to connect to WIFI it fires up a hotspot and a 
+ *    web server and allows the user to configure device parameters
+ * 
+ * - If a WIFI configuration exists, it connects then reads the configuration 
+ *    from config.json and proceeds.
+ * 
+ *********************************************************************************/
 #include <FS.h>                   //this needs to be first, or it all crashes and burns...
 #include <DNSServer.h>
 #include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson
@@ -76,7 +79,6 @@ void loadParametersfromJSON(DynamicJsonDocument json)
 // save parameters to a JSON object so they can saved to disk
 DynamicJsonDocument saveParametersToJSON()
 {
-  //JsonObject &json = jsonBuffer.createObject();
   DynamicJsonDocument json(200);
   /* common */
   json["deviceLocation"] = deviceLocation;
