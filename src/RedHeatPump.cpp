@@ -159,11 +159,7 @@ void loop() {
 */
 
 void hpSettingsChanged() {
-  const size_t bufferSize = JSON_OBJECT_SIZE(6);
-  DynamicJsonBuffer jsonBuffer(bufferSize);
-
-  JsonObject& root = jsonBuffer.createObject();
-
+  DynamicJsonDocument root(200);
   heatpumpSettings currentSettings = hp.getSettings();
 
   root["power"]       = currentSettings.power;
@@ -174,7 +170,7 @@ void hpSettingsChanged() {
   root["wideVane"]    = currentSettings.wideVane;
 
   char buffer[512];
-  root.printTo(buffer, sizeof(buffer));
+  serializeJson(root,buffer);
 
   if (!mqtt_client.publish(mqtt_topic, buffer, retain)) {
     mqtt_client.publish(mqtt_debug_topic, "failed to publish to heatpump topic");
@@ -188,15 +184,16 @@ void hpSettingsChanged() {
 
 void hpStatusChanged(heatpumpStatus currentStatus) {
   // send room temp and operating info
-  const size_t bufferSizeInfo = JSON_OBJECT_SIZE(2);
-  DynamicJsonBuffer jsonBufferInfo(bufferSizeInfo);
+  // const size_t bufferSizeInfo = JSON_OBJECT_SIZE(2);
+  // DynamicJsonBuffer jsonBufferInfo(bufferSizeInfo);
 
-  JsonObject& rootInfo = jsonBufferInfo.createObject();
+  // JsonObject& rootInfo = jsonBufferInfo.createObject();
+  DynamicJsonDocument rootInfo(500);
   rootInfo["roomTemperature"] = (isCelsius) ? hp.getRoomTemperature() : hp.CelsiusToFahrenheit(hp.getRoomTemperature());
-  rootInfo["operating"]       = currentStatus.operating;
+  rootInfo["operating"]       = currentStatus.operating ? "TRUE":"FALSE";
 
   char bufferInfo[512];
-  rootInfo.printTo(bufferInfo, sizeof(bufferInfo));
+  serializeJson(rootInfo,bufferInfo);
 
   if (!mqtt_client.publish(mqtt_status_topic, bufferInfo, true))
   {
@@ -204,10 +201,7 @@ void hpStatusChanged(heatpumpStatus currentStatus) {
   }
 
   // send the timer info
-  const size_t bufferSizeTimers = JSON_OBJECT_SIZE(5);
-  DynamicJsonBuffer jsonBufferTimers(bufferSizeTimers);
-
-  JsonObject& rootTimers = jsonBufferTimers.createObject();
+  DynamicJsonDocument rootTimers(500);
   rootTimers["mode"]          = currentStatus.timers.mode;
   rootTimers["onMins"]        = currentStatus.timers.onMinutesSet;
   rootTimers["onRemainMins"]  = currentStatus.timers.onMinutesRemaining;
@@ -215,7 +209,7 @@ void hpStatusChanged(heatpumpStatus currentStatus) {
   rootTimers["offRemainMins"] = currentStatus.timers.offMinutesRemaining;
 
   char bufferTimers[512];
-  rootTimers.printTo(bufferTimers, sizeof(bufferTimers));
+  serializeJson(rootTimers,bufferTimers);
 
   if (!mqtt_client.publish(mqtt_timers_topic, bufferTimers, true)) {
     mqtt_client.publish(mqtt_debug_topic, "failed to publish timer info to heatpump/status topic");
@@ -239,15 +233,11 @@ void hpPacketDebug(byte * packet, unsigned int length, char* packetDirection) {
       message += String(packet[idx], HEX) + " ";
     }
 
-    const size_t bufferSize = JSON_OBJECT_SIZE(1);
-    DynamicJsonBuffer jsonBuffer(bufferSize);
-
-    JsonObject& root = jsonBuffer.createObject();
+    DynamicJsonDocument root(200);
 
     root[packetDirection] = message;
-
     char buffer[512];
-    root.printTo(buffer, sizeof(buffer));
+    serializeJson(root, buffer);
 
     if (!mqtt_client.publish(mqtt_debug_topic, buffer))
     {

@@ -4,7 +4,7 @@
 #include <dConsole.h>
 #include <PubSubClient.h>
 #include <Ticker.h>
-#include <HeatPump.h>
+#include <Heatpump.h>
 #include <ArduinoJson.h>
 
 #ifndef _PINS_H
