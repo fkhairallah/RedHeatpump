@@ -36,10 +36,10 @@ The implementation in Rye Manor uses Adafruit Huzzah board
 
 
 
-![The circuit is simple -- just a TTL RS232 interface](media\schematic.jpg)
+![The circuit is simple -- just a TTL RS232 interface](.\media\schematic.jpg)
 
 
-![Pin location on the HP controller board](media\pinlocation.png)
+![Pin location on the HP controller board](.\media\pinlocation.png)
 
     - GPIO-0 must be tied to ground for programming
     - GPIO-0 floats to run program
