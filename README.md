@@ -30,7 +30,16 @@
   2. heatpump/location/debug/set -- received command (on/off) to control debug mode
 
 
-   Hardware Notes:
+# Hardware Notes
+
+The implementation in Rye Manor uses Adafruit Huzzah board
+
+
+
+![The circuit is simple -- just a TTL RS232 interface](media\schematic.jpg)
+
+
+![Pin location on the HP controller board](media\pinlocation.png)
 
     - GPIO-0 must be tied to ground for programming
     - GPIO-0 floats to run program
