@@ -36,6 +36,11 @@
 ## Version 1.2
   Direct port to Platform.IO and conversion to C++ while still retaining the original Library
   This version was not tested on direct hardware
+## Version 2.0
+  Removed Dependency on initial Heatpump library and used Platform.IO library management which also include the move to JSON 6 library
+
+  _N.B.: this version is yet to be tested on Mitsubishi hardware_
+
 
 # Hardware Notes
 
@@ -53,9 +58,9 @@ The circuit is simple -- just a TTL RS232 interface with a couple of 10K pullup 
 Important to note the pin orientation on the HP controller board
 
 Also:
-    - GPIO-0 must be tied to ground for programming
-    - GPIO-0 floats to run program
-    - GPIO-0 runs Red LED on Huzzah
-    - GPIO-2 is tied to Blue Led (*NOT* a PWM pin)
-    - GPIO-13 is RESERVED
-    - Serial port is used to communicate with heatpump and cannot be used for debugging
+- GPIO-0 must be tied to ground for programming
+- GPIO-0 floats to run program
+- GPIO-0 runs Red LED on Huzzah
+- GPIO-2 is tied to Blue Led (*NOT* a PWM pin)
+- GPIO-13 is RESERVED
+- Serial port is used to communicate with heatpump and cannot be used for debugging

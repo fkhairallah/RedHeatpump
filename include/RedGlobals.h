@@ -4,7 +4,7 @@
 #include <dConsole.h>
 #include <PubSubClient.h>
 #include <Ticker.h>
-#include <HeatPump.h>
+#include <Heatpump.h>
 #include <ArduinoJson.h>
 
 #ifndef _PINS_H
@@ -17,8 +17,7 @@
  * ********************************************************************************
 */
 
-
-#define VERSION "V1.2"
+#define VERSION "V1.2"               // N.B: document changes in README.md
 #define MQTT_TOPIC_PREFIX "heatpump" // prefix for all MQTT topics
 
 const unsigned int SEND_ROOM_TEMP_INTERVAL_MS = 60000;

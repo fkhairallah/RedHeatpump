@@ -1,11 +1,11 @@
+/*********************************************************************************
+ * 
+ * 
+ * 
+ ********************************************************************************/
 #include <WiFiManager.h>
 #include <RedGlobals.h>
 
-/*
- * ********************************************************************************
- * 
- * ********************************************************************************
- */
 
 dConsole console;
 
@@ -16,15 +16,14 @@ void handleConsole()
   {
     char str[128];
 
-    console.println("We have a command");
-    if (console.commandString == "?")
+    if (strcmp(console.commandString,  "?") == 0)
     {
       console.println("\n\n\n[RED]HeatPump");
       console.print("IP address: ");
       console.println(WiFi.localIP().toString());
       console.println("Available commands are: location room, mqtt server port, setting, status, verbose, reset (Factory), reboot");
     }
-    if (console.commandString == "reset")
+    if  (strcmp(console.commandString, "reset") == 0)
     {
       console.print("Reseting configuration...");
       //reset settings - for testing
@@ -33,7 +32,7 @@ void handleConsole()
       console.println(" Done.");
 
     }
-    if (console.commandString == "reboot")
+    if  (strcmp(console.commandString,  "reboot") == 0)
     {
       console.print("Rebooting...");
       delay(200);
@@ -42,23 +41,22 @@ void handleConsole()
       delay(5000);
     }
 
-    if (console.commandString == "status")
-    {
-      heatpumpStatus hpStatus;
-      hpStatus = hp.getStatus();
-      sprintf(str, "Room Temp: %iF, operating %i, Freq %i", hp.CelsiusToFahrenheit(hpStatus.roomTemperature), hpStatus.operating, hpStatus.compressorFrequency);
-      console.println(str);
+    if (strcmp(console.commandString, "status") == 0)
+      {
+        heatpumpStatus hpStatus;
+        hpStatus = hp.getStatus();
+        sprintf(str, "Room Temp: %iF, operating %i, Freq %i", hp.CelsiusToFahrenheit(hpStatus.roomTemperature), hpStatus.operating, hpStatus.compressorFrequency);
+        console.println(str);
 
-      sprintf(str, "MQTT Server %s, port: %s", mqttServer, mqttPort);
-      console.println(str);
-
-    }
-    if (console.commandString == "setting")
+        sprintf(str, "MQTT Server %s, port: %s", mqttServer, mqttPort);
+        console.println(str);
+      }
+    if (strcmp(console.commandString,  "setting") == 0)
     {
       heatpumpSettings hps;
       hps = hp.getSettings();
-      console.println("Power Setting: " + hps.power);
-      console.println("Mode Setting: " + hps.mode);
+      console.printf("Power Setting: %s\n",hps.power);
+      console.printf("Mode Setting: %s\n", hps.mode);
       sprintf(str, "Set Temp: %iF", hp.CelsiusToFahrenheit(hps.temperature));
       console.println(str);
 

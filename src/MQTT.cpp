@@ -1,16 +1,13 @@
-/*
-  * ********************************************************************************
 
-   Configure the MQTT server by:
-    - create all the topic using prefix/location/subtopic
-    - configure MQTT server and port and setup callback routine
-    - attempt a connection and log to debug topic if success
-
- * ********************************************************************************
-*/
+/**********************************************************************************
+ *
+ * Configure the MQTT server by:
+ *     - create all the topic using prefix/location/subtopic
+ *     - configure MQTT server and port and setup callback routine
+ *     - attempt a connection and log to debug topic if success
+ * 
+ *********************************************************************************/
 #include <RedGlobals.h>
-
-
 
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);
@@ -149,28 +146,33 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   //if the incoming message is on the heatpump_set_topic topic...
   if (strcmp(topic, mqtt_set_topic) == 0)
   {
-    // Parse message into JSON
-    const size_t bufferSize = JSON_OBJECT_SIZE(6);
-    DynamicJsonBuffer jsonBuffer(bufferSize);
-    JsonObject &root = jsonBuffer.parseObject(message);
+    // V5 - Parse message into JSON
+    // const size_t bufferSize = JSON_OBJECT_SIZE(6);
+    // DynamicJsonBuffer jsonBuffer(bufferSize);
+    // JsonObject &root = jsonBuffer.parseObject(message);
+    // if (!root.success())
+    // {
+    //   mqtt_client.publish(mqtt_debug_topic, "!root.success(): invalid JSON on heatpump_set_topic...");
+    //   return;
+    // }
 
-    if (!root.success())
-    {
-      mqtt_client.publish(mqtt_debug_topic, "!root.success(): invalid JSON on heatpump_set_topic...");
-      return;
+    // V6 - Parse message into JSON
+    DynamicJsonDocument root(200);
+    auto error = deserializeJson(root, message);
+    if (error) {
+        mqtt_client.publish(mqtt_debug_topic, "!root.success(): invalid JSON on heatpump_set_topic...");
+        return;
     }
 
     // Step 3: Retrieve the values
     if (root.containsKey("power"))
     {
-      String power = root["power"];
-      hp.setPowerSetting(power);
+      hp.setPowerSetting(strcmp(root["power"],"ON")?1:0);
     }
 
     if (root.containsKey("mode"))
     {
-      String mode = root["mode"];
-      hp.setModeSetting(mode);
+      hp.setModeSetting(root["mode"]);
     }
 
     if (root.containsKey("temperature"))
@@ -181,20 +183,17 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 
     if (root.containsKey("fan"))
     {
-      String fan = root["fan"];
-      hp.setFanSpeed(fan);
+      hp.setFanSpeed(root["fan"]);
     }
 
     if (root.containsKey("vane"))
     {
-      String vane = root["vane"];
-      hp.setVaneSetting(vane);
+      hp.setVaneSetting(root["vane"]);
     }
 
     if (root.containsKey("wideVane"))
     {
-      String wideVane = root["wideVane"];
-      hp.setWideVaneSetting(wideVane);
+      hp.setWideVaneSetting(root["wideVane"]);
     }
 
     if (root.containsKey("remoteTemp"))
@@ -237,7 +236,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
       {
         mqtt_client.publish(mqtt_debug_topic, (char*) "heatpump: update() failed");
       }
-    }
+    } 
   }
   //if the incoming message is on the heatpump_debug_set_topic topic...
   else if (strcmp(topic, mqtt_debug_set_topic) == 0)
@@ -256,5 +255,5 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   else
   {
     mqtt_client.publish(mqtt_debug_topic, strcat((char *)"heatpump: wrong mqtt topic: ", topic));
-  }
+  } 
 }
