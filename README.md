@@ -37,8 +37,9 @@
   Direct port to Platform.IO and conversion to C++ while still retaining the original Library
   This version was not tested on direct hardware
 ## Version 2.0
-  Removed Dependency on initial Heatpump library and used Platform.IO library management
-  which also include the move to JSON 6 library
+  Removed Dependency on initial Heatpump library and used Platform.IO library management which also include the move to JSON 6 library
+
+  _N.B.: this version is yet to be tested on Mitsubishi hardware_
 
 
 # Hardware Notes
