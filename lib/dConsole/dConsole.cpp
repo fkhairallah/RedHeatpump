@@ -47,6 +47,11 @@ void dConsole::disableSerial()
 
 void dConsole::enableTelnet(int tcpPort)
 {
+	if (telnetPort) // Telnet is already enabled
+	{
+		this->println("ERR: Attempting to open second telnet port");
+		return;
+	}
 	telnetPort = tcpPort;
 	if (telnetPort)
 	{
@@ -67,6 +72,11 @@ void dConsole::disableTelnet()
 		this->println("[Console is deactivate on telnet port]");
 
 	}
+}
+
+void dConsole::closeTelnetConnection()
+{
+	if (client) client.stop();
 }
 
 void dConsole::enableUDP(IPAddress localIP, int port)
@@ -138,7 +148,13 @@ bool dConsole::isTelnetConnected() {
     {
 		if (server->status() == CLOSED) return true;
 
-		if (!client) client = server->available();
+		// if we don't have a client, check to see if we have one.
+		// then flush the queue so we don't get weird characters
+		if (!client) 
+		{
+			client = server->available();
+			client.flush();
+		}
 	
 
 		if (client) {
@@ -148,6 +164,7 @@ bool dConsole::isTelnetConnected() {
 		  // client is not connected, stop and get a new one
 		  client.stop();
 		  client = server->available();
+		  client.flush();
 
 		}
 	}
@@ -212,7 +229,9 @@ void dConsole::flush() {
 
   if (disconnected()) return;
 
-  server->flush();
+  serial->flush();
+
+  client.flush();
 
 }
 
@@ -224,22 +243,40 @@ bool dConsole::check()
 	{
 		while (serial->available()) {
 			char c = serial->read();
-			//printf("%i\r\n",c);
-			if (c < 127) { // we sometimes start with weird characters
-				yield();	// yield back to the OS
-				if (c == '\r') continue; // ignore CR
-				if ( (c == '\n') || (bufferCount >= CMD_MAX_LENGTH) ) // LF is a command or max length
-				{
-					return parseCommand();
+			yield(); // yield back to the OS
 
+			//printf("%i\r\n",c);
+			if (c == '\x08') // backspace
+			{
+				if (bufferCount > 0)
+				{
+					tempBuffer[--bufferCount] = 0;
 				}
-				else {
-					serial->write(c);
-					tempBuffer[bufferCount++] = c;
-					tempBuffer[bufferCount] = 0;
-					//println(tempBuffer);
-				}
+				serial->write(c);
+				continue;
 			}
+			if (c == '\x15') // Control U -- erase entire line
+			{
+				bufferCount = 0;
+				tempBuffer[bufferCount] = 0;
+				serial->println();
+				continue;
+			}
+
+			if (c > 127) continue; // we sometimes start with weird characters
+			if (c == '\r') continue; // ignore CR
+			if ( (c == '\n') || (bufferCount >= CMD_MAX_LENGTH) ) // LF is a command or max length
+			{
+				return parseCommand();
+
+			}
+			else {
+				serial->write(c);
+				tempBuffer[bufferCount++] = c;
+				tempBuffer[bufferCount] = 0;
+				//println(tempBuffer);
+			}
+			
 		}
 	}
 
@@ -257,6 +294,7 @@ bool dConsole::check()
 					println("Connected to [RED] debug console");
 					println("'?' for more, 'exit' to exit");
 					print("[RED]> ");
+
 				}
 			}
 		}
@@ -268,26 +306,33 @@ bool dConsole::check()
 			while (client.available()) {
 				char c = client.read();
 				yield();	// yield back to the OS
+
+
+				if (c == '\x08') // backspace
+				{
+					if (bufferCount > 0)
+					{
+						tempBuffer[--bufferCount] = 0;
+					}
+					continue;
+				}
+				if (c == '\x15') // Control U -- erase entire line
+				{
+					bufferCount = 0;
+					tempBuffer[bufferCount] = 0;
+					continue;
+				}
+
 				if (c == '\r') continue; // ignore CR
 				if ((c == '\n') || (bufferCount >= CMD_MAX_LENGTH) )  // LF is a command
 				{
-
-					// interecpt 'exit' command
-					if (strcmp(tempBuffer,"exit") == 0)
-					{
-						tempBuffer[0] = 0;
-						bufferCount = 0;
-						client.stop();
-						return false;
-					}
-
 					// we have a full line--> exit true
 					return parseCommand();
 				}
-				else {
+				else 
+				{
 					tempBuffer[bufferCount++] = c;
 					tempBuffer[bufferCount] = 0;
-
 				}
 			}
 		}
@@ -310,8 +355,6 @@ void dConsole::sendUDP(char* sentence)
   udp.write(sentence);
   udp.endPacket();
 }
-
-
 
 
 // parse line typed in into a command and a parameter
